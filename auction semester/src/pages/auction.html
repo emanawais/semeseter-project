@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AuctionHub - Live Auctions</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    :root {
+      --primary: #4f46e5;
+      --primary-dark: #4338ca;
+      --secondary: #10b981;
+      --dark: #1e293b;
+      --light: #f8fafc;
+    }
+    
+    body {
+      background-color: #f3f4f6;
+      background-image: radial-gradient(circle at 10% 20%, rgba(248, 250, 252, 0.8) 0%, rgba(226, 232, 240, 0.8) 90%);
+    }
+    
+    .auction-card {
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
+      background: linear-gradient(to bottom right, rgba(255, 255, 255, 0.9), rgba(248, 250, 252, 0.9));
+    }
+    
+    .auction-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
+    }
+    
+    .countdown-badge {
+      font-family: 'Courier New', monospace;
+      letter-spacing: -0.5px;
+    }
+    
+    .nav-link {
+      position: relative;
+    }
+    
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      width: 0;
+      height: 2px;
+      bottom: -4px;
+      left: 0;
+      background-color: var(--primary);
+      transition: width 0.3s ease;
+    }
+    
+    .nav-link:hover::after {
+      width: 100%;
+    }
+    
+    .active-nav-link::after {
+      width: 100%;
+    }
+    
+    .search-input:focus {
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+    }
+    
+    .category-chip {
+      transition: all 0.2s ease;
+    }
+    
+    .category-chip:hover {
+      transform: scale(1.05);
+    }
+    
+    .category-chip.active {
+      background-color: var(--primary);
+      color: white;
+    }
+    
+    .progress-bar {
+      height: 4px;
+      background-color: #e2e8f0;
+    }
+    
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(to right, var(--primary), var(--secondary));
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col font-sans antialiased">
+  <!-- Navigation Bar -->
+  <header class="bg-white shadow-sm sticky top-0 z-50">
+    <div class="container mx-auto px-4">
+      <div class="flex justify-between items-center h-16">
+        <!-- Logo -->
+        <div class="flex items-center">
+          <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-indigo-100 text-indigo-600 mr-3">
+            <i class="fas fa-gavel text-xl"></i>
+          </div>
+          <a href="../../index.html" class="text-xl font-bold text-gray-800">Auction<span class="text-indigo-600">Hub</span></a>
+        </div>
+        
+        <!-- Desktop Navigation -->
+        <nav class="hidden md:flex items-center space-x-8">
+          <a href="../../index.html" class="nav-link text-gray-600 hover:text-gray-900">Home</a>
+          <a href="auction.html" class="nav-link active-nav-link text-gray-900 font-medium">Auctions</a>
+          <a href="sell.html" class="nav-link text-gray-600 hover:text-gray-900">Sell</a>
+          <a href="dashboard.html" class="nav-link text-gray-600 hover:text-gray-900">Dashboard</a>
+          <div class="ml-4">
+            <a href="login.html" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 transition-colors duration-150">
+              <i class="fas fa-sign-in-alt mr-2"></i> Sign In
+            </a>
+          </div>
+        </nav>
+        
+        <!-- Mobile menu button -->
+        <button id="mobile-menu-button" class="md:hidden text-gray-500 hover:text-gray-900 focus:outline-none">
+          <i class="fas fa-bars text-xl"></i>
+        </button>
+      </div>
+    </div>
+    
+    <!-- Mobile Navigation -->
+    <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-gray-200">
+      <div class="container mx-auto px-4 py-3 space-y-2">
+        <a href="../../index.html" class="block py-2 px-4 rounded-lg hover:bg-gray-50 text-gray-700">Home</a>
+        <a href="auction.html" class="block py-2 px-4 rounded-lg bg-indigo-50 text-indigo-700 font-medium">Auctions</a>
+        <a href="sell.html" class="block py-2 px-4 rounded-lg hover:bg-gray-50 text-gray-700">Sell</a>
+        <a href="dashboard.html" class="block py-2 px-4 rounded-lg hover:bg-gray-50 text-gray-700">Dashboard</a>
+        <a href="login.html" class="block py-2 px-4 rounded-lg bg-indigo-600 text-white text-center font-medium hover:bg-indigo-700 transition-colors duration-150">
+          Sign In
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white py-12 md:py-16">
+    <div class="container mx-auto px-4 text-center">
+      <h1 class="text-3xl md:text-4xl font-bold mb-4">Discover Unique Items at <span class="text-yellow-300">Live Auctions</span></h1>
+      <p class="text-lg md:text-xl max-w-3xl mx-auto mb-8">Bid on exclusive collectibles, rare finds, and one-of-a-kind treasures from around the world</p>
+      
+      <div class="max-w-2xl mx-auto relative">
+        <input type="text" placeholder="Search for items, brands, or categories..." 
+               class="w-full py-4 px-6 rounded-full shadow-lg focus:outline-none focus:ring-2 focus:ring-indigo-300 text-gray-800">
+        <button class="absolute right-2 top-2 bg-indigo-700 hover:bg-indigo-800 text-white py-2 px-6 rounded-full transition-colors duration-150">
+          <i class="fas fa-search mr-2"></i> Search
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Content -->
+  <main class="flex-grow container mx-auto px-4 py-8">
+    <!-- Category Filters -->
+    <div class="mb-8">
+      <h2 class="text-xl font-semibold text-gray-800 mb-4">Browse Categories</h2>
+      <div class="flex flex-wrap gap-3">
+        <button class="category-chip active px-4 py-2 bg-indigo-600 text-white rounded-full text-sm font-medium">
+          All Items
+        </button>
+        <button class="category-chip px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium hover:bg-gray-50">
+          <i class="fas fa-laptop mr-2 text-blue-500"></i> Electronics
+        </button>
+        <button class="category-chip px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium hover:bg-gray-50">
+          <i class="fas fa-tshirt mr-2 text-purple-500"></i> Fashion
+        </button>
+        <button class="category-chip px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium hover:bg-gray-50">
+          <i class="fas fa-home mr-2 text-green-500"></i> Home & Garden
+        </button>
+        <button class="category-chip px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium hover:bg-gray-50">
+          <i class="fas fa-palette mr-2 text-yellow-500"></i> Art & Collectibles
+        </button>
+        <button class="category-chip px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium hover:bg-gray-50">
+          <i class="fas fa-car mr-2 text-red-500"></i> Vehicles
+        </button>
+        <button class="category-chip px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium hover:bg-gray-50">
+          <i class="fas fa-gem mr-2 text-pink-500"></i> Jewelry
+        </button>
+      </div>
+    </div>
+
+    <!-- Content Header -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
+      <div>
+        <h2 class="text-2xl font-bold text-gray-800">Live Auctions</h2>
+        <p class="text-gray-600">Ending soon - don't miss your chance to bid!</p>
+      </div>
+      
+      <div class="mt-4 md:mt-0 flex items-center space-x-4">
+        <div class="relative">
+          <select class="appearance-none bg-white border border-gray-300 rounded-lg pl-4 pr-10 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+            <option>Sort by: Ending Soonest</option>
+            <option>Sort by: Newest Listings</option>
+            <option>Sort by: Price Low to High</option>
+            <option>Sort by: Price High to Low</option>
+          </select>
+          <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+            <i class="fas fa-chevron-down text-gray-400"></i>
+          </div>
+        </div>
+        
+        <a href="sell.html" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 transition-colors duration-150">
+          <i class="fas fa-plus mr-2"></i> Sell Item
+        </a>
+      </div>
+    </div>
+
+    <!-- Auction Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-10">
+      <!-- Auction Item 1 -->
+      <div class="auction-card rounded-xl overflow-hidden">
+        <div class="relative">
+          <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="Vintage Watch" class="w-full h-48 object-cover">
+          <div class="absolute top-3 right-3">
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+              <i class="fas fa-bolt mr-1"></i> Hot Bid
+            </span>
+          </div>
+          <div class="absolute bottom-3 left-3">
+            <span class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-black bg-opacity-70 text-white countdown-badge">
+              <i class="fas fa-clock mr-1"></i> 1h 23m
+            </span>
+          </div>
+        </div>
+        <div class="p-5">
+          <div class="flex justify-between items-start mb-2">
+            <h3 class="text-lg font-semibold text-gray-800 truncate">Vintage Rolex Submariner</h3>
+            <button class="text-gray-400 hover:text-red-500">
+              <i class="far fa-heart"></i>
+            </button>
+          </div>
+          <p class="text-gray-600 text-sm mb-4">1972 model, excellent condition with original box</p>
+          
+          <div class="mb-3">
+            <div class="flex justify-between text-xs text-gray-500 mb-1">
+              <span>15 bids</span>
+              <span>Reserve met</span>
+            </div>
+            <div class="progress-bar rounded-full overflow-hidden">
+              <div class="progress-fill" style="width: 85%"></div>
+            </div>
+          </div>
+          
+          <div class="flex justify-between items-center">
+            <div>
+              <p class="text-xs text-gray-500">Current Bid</p>
+              <p class="text-lg font-bold text-indigo-600">$8,450.00</p>
+            </div>
+            <button class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 transition-colors duration-150">
+              Place Bid
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Auction Item 2 -->
+      <div class="auction-card rounded-xl overflow-hidden">
+        <div class="relative">
+          <img src="https://images.unsplash.com/photo-1546868871-7041f2a55e12?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="Antique Camera" class="w-full h-48 object-cover">
+          <div class="absolute bottom-3 left-3">
+            <span class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-black bg-opacity-70 text-white countdown-badge">
+              <i class="fas fa-clock mr-1"></i> 3h 45m
+            </span>
+          </div>
+        </div>
+        <div class="p-5">
+          <div class="flex justify-between items-start mb-2">
+            <h3 class="text-lg font-semibold text-gray-800 truncate">Leica M3 Camera 1954</h3>
+            <button class="text-gray-400 hover:text-red-500">
+              <i class="far fa-heart"></i>
+            </button>
+          </div>
+          <p class="text-gray-600 text-sm mb-4">Fully functional with original leather case</p>
+          
+          <div class="mb-3">
+            <div class="flex justify-between text-xs text-gray-500 mb-1">
+              <span>8 bids</span>
+              <span>Reserve not met</span>
+            </div>
+            <div class="progress-bar rounded-full overflow-hidden">
+              <div class="progress-fill" style="width: 40%"></div>
+            </div>
+          </div>
+          
+          <div class="flex justify-between items-center">
+            <div>
+              <p class="text-xs text-gray-500">Current Bid</p>
+              <p class="text-lg font-bold text-indigo-600">$1,250.00</p>
+            </div>
+            <button class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 transition-colors duration-150">
+              Place Bid
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Auction Item 3 -->
+      <div class="auction-card rounded-xl overflow-hidden">
+        <div class="relative">
+          <img src="https://images.unsplash.com/photo-1601784551446-20c9e07cdbdb?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="Signed Guitar" class="w-full h-48 object-cover">
+          <div class="absolute top-3 right-3">
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+              <i class="fas fa-star mr-1"></i> Rare
+            </span>
+          </div>
+          <div class="absolute bottom-3 left-3">
+            <span class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-black bg-opacity-70 text-white countdown-badge">
+              <i class="fas fa-clock mr-1"></i> 6h 12m
+            </span>
+          </div>
+        </div>
+        <div class="p-5">
+          <div class="flex justify-between items-start mb-2">
+            <h3 class="text-lg font-semibold text-gray-800 truncate">Signed Fender Stratocaster</h3>
+            <button class="text-gray-400 hover:text-red-500">
+              <i class="far fa-heart"></i>
+            </button>
+          </div>
+          <p class="text-gray-600 text-sm mb-4">Signed by Eric Clapton, 1996 model</p>
+          
+          <div class="mb-3">
+            <div class="flex justify-between text-xs text-gray-500 mb-1">
+              <span>22 bids</span>
+              <span>Reserve met</span>
+            </div>
+            <div class="progress-bar rounded-full overflow-hidden">
+              <div class="progress-fill" style="width: 95%"></div>
+            </div>
+          </div>
+          
+          <div class="flex justify-between items-center">
+            <div>
+              <p class="text-xs text-gray-500">Current Bid</p>
+              <p class="text-lg font-bold text-indigo-600">$12,800.00</p>
+            </div>
+            <button class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 transition-colors duration-150">
+              Place Bid
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Auction Item 4 -->
+      <div class="auction-card rounded-xl overflow-hidden">
+        <div class="relative">
+          <img src="https://images.unsplash.com/photo-1539185441755-769473a23570?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="Painting" class="w-full h-48 object-cover">
+          <div class="absolute bottom-3 left-3">
+            <span class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-black bg-opacity-70 text-white countdown-badge">
+              <i class="fas fa-clock mr-1"></i> 1d 4h
+            </span>
+          </div>
+        </div>
+        <div class="p-5">
+          <div class="flex justify-between items-start mb-2">
+            <h3 class="text-lg font-semibold text-gray-800 truncate">Original Landscape Painting</h3>
+            <button class="text-gray-400 hover:text-red-500">
+              <i class="far fa-heart"></i>
+            </button>
+          </div>
+          <p class="text-gray-600 text-sm mb-4">Oil on canvas, 24" x 36", contemporary artist</p>
+          
+          <div class="mb-3">
+            <div class="flex justify-between text-xs text-gray-500 mb-1">
+              <span>5 bids</span>
+              <span>Reserve not met</span>
+            </div>
+            <div class="progress-bar rounded-full overflow-hidden">
+              <div class="progress-fill" style="width: 30%"></div>
+            </div>
+          </div>
+          
+          <div class="flex justify-between items-center">
+            <div>
+              <p class="text-xs text-gray-500">Current Bid</p>
+              <p class="text-lg font-bold text-indigo-600">$850.00</p>
+            </div>
+            <button class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 transition-colors duration-150">
+              Place Bid
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pagination -->
+    <div class="flex justify-center">
+      <nav class="inline-flex rounded-md shadow-sm -space-x-px">
+        <a href="#" class="inline-flex items-center px-3 py-2 rounded-l-md border border-gray-300 bg-white text-gray-500 hover:bg-gray-50">
+          <i class="fas fa-chevron-left"></i>
+        </a>
+        <a href="#" class="inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-indigo-600 font-medium">1</a>
+        <a href="#" class="inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-gray-700 hover:bg-gray-50">2</a>
+        <a href="#" class="inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-gray-700 hover:bg-gray-50">3</a>
+        <span class="inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-gray-700">...</span>
+        <a href="#" class="inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-gray-700 hover:bg-gray-50">8</a>
+        <a href="#" class="inline-flex items-center px-3 py-2 rounded-r-md border border-gray-300 bg-white text-gray-500 hover:bg-gray-50">
+          <i class="fas fa-chevron-right"></i>
+        </a>
+      </nav>
+    </div>
+  </main>
+
+  <!-- Newsletter Section -->
+  <section class="bg-indigo-50 py-12">
+    <div class="container mx-auto px-4 text-center">
+      <div class="max-w-2xl mx-auto">
+        <h2 class="text-2xl font-bold text-gray-800 mb-4">Never Miss a Deal</h2>
+        <p class="text-gray-600 mb-6">Subscribe to get notified about new auctions and exclusive items</p>
+        
+        <form class="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
+          <input type="email" placeholder="Your email address" 
+                 class="flex-grow px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+          <button type="submit" class="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-colors duration-150">
+            Subscribe
+          </button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-gray-800 text-white pt-12 pb-6">
+    <div class="container mx-auto px-4">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+        <!-- About -->
+        <div>
+          <div class="flex items-center mb-4">
+            <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-indigo-100 text-indigo-600 mr-3">
+              <i class="fas fa-gavel text-xl"></i>
+            </div>
+            <h3 class="text-xl font-bold">Auction<span class="text-indigo-400">Hub</span></h3>
+          </div>
+          <p class="text-gray-400 mb-4">The premier online auction platform for unique finds and collectibles.</p>
+          <div class="flex space-x-4">
+            <a href="#" class="text-gray-400 hover:text-white transition-colors duration-150">
+              <i class="fab fa-facebook-f"></i>
+            </a>
+            <a href="#" class="text-gray-400 hover:text-white transition-colors duration-150">
+              <i class="fab fa-twitter"></i>
+            </a>
+            <a href="#" class="text-gray-400 hover:text-white transition-colors duration-150">
+              <i class="fab fa-instagram"></i>
+            </a>
+            <a href="#" class="text-gray-400 hover:text-white transition-colors duration-150">
+              <i class="fab fa-pinterest-p"></i>
+            </a>
+          </div>
+        </div>
+        
+        <!-- Quick Links -->
+        <div>
+          <h4 class="text-lg font-semibold mb-4">Quick Links</h4>
+          <ul class="space-y-2">
+            <li><a href="../../index.html" class="text-gray-400 hover:text-white transition-colors duration-150">Home</a></li>
+            <li><a href="auction.html" class="text-gray-400 hover:text-white transition-colors duration-150">Live Auctions</a></li>
+            <li><a href="sell.html" class="text-gray-400 hover:text-white transition-colors duration-150">Sell Items</a></li>
+            <li><a href="dashboard.html" class="text-gray-400 hover:text-white transition-colors duration-150">My Dashboard</a></li>
+          </ul>
+        </div>
+        
+        <!-- Help & Support -->
+        <div>
+          <h4 class="text-lg font-semibold mb-4">Help & Support</h4>
+          <ul class="space-y-2">
+            <li><a href="#" class="text-gray-400 hover:text-white transition-colors duration-150">FAQs</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-white transition-colors duration-150">Shipping Information</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-white transition-colors duration-150">Returns & Refunds</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-white transition-colors duration-150">Contact Support</a></li>
+          </ul>
+        </div>
+        
+        <!-- Contact Info -->
+        <div>
+          <h4 class="text-lg font-semibold mb-4">Contact Us</h4>
+          <ul class="space-y-2 text-gray-400">
+            <li class="flex items-start">
+              <i class="fas fa-map-marker-alt mt-1 mr-3 text-indigo-400"></i>
+              <span>123 Auction Street, New York, NY 10001</span>
+            </li>
+            <li class="flex items-center">
+              <i class="fas fa-phone-alt mr-3 text-indigo-400"></i>
+              <span>(800) 555-AUCT</span>
+            </li>
+            <li class="flex items-center">
+              <i class="fas fa-envelope mr-3 text-indigo-400"></i>
+              <span>support@auctionhub.com</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="border-t border-gray-700 pt-6 flex flex-col md:flex-row justify-between items-center">
+        <p class="text-gray-400 text-sm mb-4 md:mb-0">&copy; 2023 AuctionHub. All rights reserved.</p>
+        <div class="flex space-x-6">
+          <a href="#" class="text-gray-400 hover:text-white text-sm transition-colors duration-150">Privacy Policy</a>
+          <a href="#" class="text-gray-400 hover:text-white text-sm transition-colors duration-150">Terms of Service</a>
+          <a href="#" class="text-gray-400 hover:text-white text-sm transition-colors duration-150">Cookie Policy</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Mobile menu toggle
+    document.getElementById('mobile-menu-button').addEventListener('click', function() {
+      const menu = document.getElementById('mobile-menu');
+      menu.classList.toggle('hidden');
+    });
+    
+    // Category chips functionality
+    const categoryChips = document.querySelectorAll('.category-chip');
+    categoryChips.forEach(chip => {
+      chip.addEventListener('click', function() {
+        categoryChips.forEach(c => c.classList.remove('active', 'bg-indigo-600', 'text-white'));
+        this.classList.add('active', 'bg-indigo-600', 'text-white');
+      });
+    });
+    
+    // Auction card hover effects
+    const auctionCards = document.querySelectorAll('.auction-card');
+    auctionCards.forEach(card => {
+      card.addEventListener('mouseenter', function() {
+        this.querySelector('img').style.transform = 'scale(1.03)';
+      });
+      card.addEventListener('mouseleave', function() {
+        this.querySelector('img').style.transform = 'scale(1)';
+      });
+    });
+    
+    // Place bid buttons
+    const bidButtons = document.querySelectorAll('button:contains("Place Bid")');
+    bidButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        const itemName = this.closest('.auction-card').querySelector('h3').textContent;
+        alert(`Bid placed on ${itemName}!`);
+      });
+    });
+    
+    // Wishlist buttons
+    const wishlistButtons = document.querySelectorAll('.fa-heart');
+    wishlistButtons.forEach(button => {
+      button.addEventListener('click', function(e) {
+        e.preventDefault();
+        if (this.classList.contains('far')) {
+          this.classList.remove('far');
+          this.classList.add('fas', 'text-red-500');
+        } else {
+          this.classList.remove('fas', 'text-red-500');
+          this.classList.add('far');
+        }
+      });
+    });
+  </script>
+</body>
+</html>

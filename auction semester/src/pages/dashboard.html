@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AuctionHub | User Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    :root {
+      --primary: #4f46e5;
+      --secondary: #10b981;
+      --dark: #1e293b;
+      --light: #f8fafc;
+    }
+    
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f8fafc;
+    }
+    
+    .dashboard-card {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(226, 232, 240, 0.6);
+      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+    
+    .dashboard-card:hover {
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+      transform: translateY(-2px);
+    }
+    
+    .nav-link {
+      position: relative;
+    }
+    
+    .nav-link:after {
+      content: '';
+      position: absolute;
+      width: 0;
+      height: 2px;
+      bottom: -4px;
+      left: 0;
+      background-color: var(--primary);
+      transition: width 0.3s ease;
+    }
+    
+    .nav-link:hover:after {
+      width: 100%;
+    }
+    
+    .gradient-text {
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    
+    .countdown-badge {
+      font-family: 'Roboto Mono', monospace;
+    }
+    
+    .file-upload {
+      border: 2px dashed #cbd5e1;
+      transition: all 0.3s ease;
+    }
+    
+    .file-upload:hover {
+      border-color: var(--primary);
+      background-color: rgba(79, 70, 229, 0.05);
+    }
+    
+    .status-badge {
+      font-size: 0.75rem;
+      padding: 0.25rem 0.5rem;
+      border-radius: 9999px;
+    }
+    
+    .status-active {
+      background-color: #d1fae5;
+      color: #065f46;
+    }
+    
+    .status-outbid {
+      background-color: #fef3c7;
+      color: #92400e;
+    }
+    
+    .status-winning {
+      background-color: #dbeafe;
+      color: #1e40af;
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-gray-50">
+  <!-- Floating Navigation -->
+  <header class="fixed w-full z-50 bg-white shadow-sm">
+    <div class="container mx-auto px-6 py-3">
+      <div class="flex justify-between items-center">
+        <div class="flex items-center space-x-2">
+          <i class="fas fa-gavel text-indigo-500 text-2xl"></i>
+          <a href="../../index.html" class="text-2xl font-bold text-slate-800">Auction<span class="gradient-text">Hub</span></a>
+        </div>
+        
+        <nav class="hidden lg:flex items-center space-x-8">
+          <a href="../../index.html" class="nav-link text-slate-600 hover:text-indigo-600">Home</a>
+          <a href="../pages/auction.html" class="nav-link text-slate-600 hover:text-indigo-600">Auctions</a>
+          <a href="../pages/sell.html" class="nav-link text-slate-600 hover:text-indigo-600">Sell</a>
+          <a href="../pages/dashboard.html" class="nav-link text-indigo-600 font-medium">Dashboard</a>
+          <div class="flex items-center space-x-4">
+            <div class="relative">
+              <button class="text-slate-600 hover:text-indigo-600">
+                <i class="fas fa-bell text-xl"></i>
+                <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">3</span>
+              </button>
+            </div>
+            <div class="h-8 w-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-medium">UA</div>
+          </div>
+        </nav>
+        
+        <button id="mobile-menu-button" class="lg:hidden text-slate-700 focus:outline-none">
+          <i class="fas fa-bars text-xl"></i>
+        </button>
+      </div>
+    </div>
+    
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="hidden lg:hidden bg-white shadow-lg mx-6 rounded-lg p-4">
+      <ul class="space-y-3">
+        <li><a href="../../index.html" class="block py-2 px-4 rounded-lg font-medium text-slate-700 hover:bg-indigo-50">Home</a></li>
+        <li><a href="../pages/auction.html" class="block py-2 px-4 rounded-lg font-medium text-slate-700 hover:bg-indigo-50">Auctions</a></li>
+        <li><a href="../pages/sell.html" class="block py-2 px-4 rounded-lg font-medium text-slate-700 hover:bg-indigo-50">Sell</a></li>
+        <li><a href="../pages/dashboard.html" class="block py-2 px-4 rounded-lg font-medium bg-indigo-50 text-indigo-600">Dashboard</a></li>
+        <li class="pt-3 border-t border-slate-100">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+              <div class="h-8 w-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-medium">UA</div>
+              <span class="font-medium">UNEEB ALI</span>
+            </div>
+            <button class="text-slate-600 hover:text-indigo-600">
+              <i class="fas fa-bell text-xl"></i>
+              <span class="relative -top-2 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">3</span>
+            </button>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </header>
+
+  <!-- Dashboard Content -->
+  <main class="pt-24 pb-12 container mx-auto px-6">
+    <!-- Welcome Section -->
+    <section class="mb-10">
+      <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
+        <div>
+          <h1 class="text-3xl font-bold text-slate-800 mb-2">Welcome back, <span class="gradient-text">EMAN AWAIS</span></h1>
+          <p class="text-slate-600">Here's your auction activity and account overview</p>
+        </div>
+        <div class="mt-4 md:mt-0 flex space-x-3">
+          <div class="bg-white rounded-xl shadow-sm p-4 flex items-center">
+            <div class="bg-indigo-100 p-2 rounded-lg mr-3">
+              <i class="fas fa-wallet text-indigo-600"></i>
+            </div>
+            <div>
+              <p class="text-sm text-slate-500">Account Balance</p>
+              <p class="font-bold text-slate-800">$1,245.00</p>
+            </div>
+          </div>
+          <button class="bg-gradient-to-r from-indigo-500 to-emerald-500 text-white px-6 py-3 rounded-xl shadow hover:shadow-md transition-all duration-300 flex items-center">
+            <i class="fas fa-plus mr-2"></i> Add Funds
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Dashboard Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <!-- Left Column -->
+      <div class="lg:col-span-2 space-y-8">
+        <!-- Quick List Item Card -->
+        <section class="dashboard-card rounded-xl p-8 shadow-sm">
+          <div class="flex items-center mb-6">
+            <div class="bg-indigo-100 p-3 rounded-lg mr-4">
+              <i class="fas fa-plus-circle text-indigo-600 text-xl"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-slate-800">List New Item</h2>
+          </div>
+          
+          <form id="listingForm" class="space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label class="block text-sm font-medium text-slate-700 mb-2">Item Title</label>
+                <input type="text" placeholder="e.g. Vintage Leica Camera" 
+                      class="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-slate-700 mb-2">Category</label>
+                <select class="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                  <option value="">Select Category</option>
+                  <option value="electronics">Electronics</option>
+                  <option value="fashion">Fashion</option>
+                  <option value="home">Home & Garden</option>
+                  <option value="collectibles">Collectibles</option>
+                  <option value="art">Art</option>
+                </select>
+              </div>
+            </div>
+            
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-2">Description</label>
+              <textarea placeholder="Describe your item in detail..." 
+                       class="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent h-32"></textarea>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div>
+                <label class="block text-sm font-medium text-slate-700 mb-2">Starting Bid ($)</label>
+                <input type="number" placeholder="0.00" min="0" step="0.01"
+                      class="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-slate-700 mb-2">Reserve Price ($)</label>
+                <input type="number" placeholder="Optional" min="0" step="0.01"
+                      class="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-slate-700 mb-2">Duration</label>
+                <select class="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                  <option value="24">24 Hours</option>
+                  <option value="48">48 Hours</option>
+                  <option value="72">72 Hours</option>
+                  <option value="168">7 Days</option>
+                </select>
+              </div>
+            </div>
+            
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-2">Item Images</label>
+              <div class="file-upload rounded-xl p-8 text-center cursor-pointer">
+                <div class="flex flex-col items-center justify-center">
+                  <i class="fas fa-cloud-upload-alt text-4xl text-slate-400 mb-3"></i>
+                  <p class="text-slate-500 mb-2">Drag & drop images here or click to browse</p>
+                  <p class="text-sm text-slate-400">JPEG or PNG, max 5MB each</p>
+                  <input type="file" multiple accept="image/*" class="hidden">
+                  <button type="button" class="mt-4 bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-lg transition-colors duration-300">
+                    Select Files
+                  </button>
+                </div>
+                <div class="mt-6 grid grid-cols-3 gap-3" id="imagePreviews"></div>
+              </div>
+            </div>
+            
+            <div class="pt-2">
+              <button type="submit" class="w-full bg-gradient-to-r from-indigo-500 to-emerald-500 text-white font-bold py-4 px-6 rounded-xl shadow hover:shadow-md transition-all duration-300">
+                <i class="fas fa-check-circle mr-2"></i> List Item for Auction
+              </button>
+            </div>
+          </form>
+        </section>
+
+        <!-- Active Listings Card -->
+        <section class="dashboard-card rounded-xl p-8 shadow-sm">
+          <div class="flex items-center justify-between mb-6">
+            <div class="flex items-center">
+              <div class="bg-emerald-100 p-3 rounded-lg mr-4">
+                <i class="fas fa-gavel text-emerald-600 text-xl"></i>
+              </div>
+              <h2 class="text-2xl font-bold text-slate-800">Your Active Listings</h2>
+            </div>
+            <a href="#" class="text-indigo-600 hover:text-indigo-800 font-medium flex items-center">
+              View All <i class="fas fa-chevron-right ml-1"></i>
+            </a>
+          </div>
+          
+          <div class="space-y-4">
+            <!-- Listing Item 1 -->
+            <div class="flex items-start p-5 border border-slate-100 rounded-xl hover:bg-slate-50 transition-colors duration-200">
+              <img src="https://source.unsplash.com/random/300x200/?vintage,camera" alt="Vintage Camera" 
+                   class="w-24 h-24 object-cover rounded-lg mr-5">
+              <div class="flex-1">
+                <div class="flex justify-between items-start">
+                  <div>
+                    <h3 class="font-semibold text-lg text-slate-800">Vintage Leica M3</h3>
+                    <p class="text-slate-500 text-sm mt-1">Ends in: <span class="countdown-badge bg-slate-100 text-slate-800 px-2 py-1 rounded">02:45:18</span></p>
+                  </div>
+                  <span class="status-badge status-active">Active</span>
+                </div>
+                <div class="flex justify-between items-center mt-4">
+                  <div>
+                    <p class="text-sm text-slate-500">Current Bid</p>
+                    <p class="text-xl font-bold text-emerald-600">$850.00</p>
+                    <p class="text-xs text-slate-400">12 bids placed</p>
+                  </div>
+                  <div class="flex space-x-2">
+                    <button class="text-indigo-600 hover:text-indigo-800 p-2">
+                      <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="text-red-600 hover:text-red-800 p-2">
+                      <i class="fas fa-trash-alt"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Listing Item 2 -->
+            <div class="flex items-start p-5 border border-slate-100 rounded-xl hover:bg-slate-50 transition-colors duration-200">
+              <img src="https://source.unsplash.com/random/300x200/?smartwatch" alt="Smart Watch" 
+                   class="w-24 h-24 object-cover rounded-lg mr-5">
+              <div class="flex-1">
+                <div class="flex justify-between items-start">
+                  <div>
+                    <h3 class="font-semibold text-lg text-slate-800">Apple Watch Ultra</h3>
+                    <p class="text-slate-500 text-sm mt-1">Ends in: <span class="countdown-badge bg-slate-100 text-slate-800 px-2 py-1 rounded">01:22:45</span></p>
+                  </div>
+                  <span class="status-badge status-active">Active</span>
+                </div>
+                <div class="flex justify-between items-center mt-4">
+                  <div>
+                    <p class="text-sm text-slate-500">Current Bid</p>
+                    <p class="text-xl font-bold text-emerald-600">$420.00</p>
+                    <p class="text-xs text-slate-400">8 bids placed</p>
+                  </div>
+                  <div class="flex space-x-2">
+                    <button class="text-indigo-600 hover:text-indigo-800 p-2">
+                      <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="text-red-600 hover:text-red-800 p-2">
+                      <i class="fas fa-trash-alt"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- Right Column -->
+      <div class="space-y-8">
+        <!-- Bidding Activity Card -->
+        <section class="dashboard-card rounded-xl p-8 shadow-sm">
+          <div class="flex items-center mb-6">
+            <div class="bg-purple-100 p-3 rounded-lg mr-4">
+              <i class="fas fa-history text-purple-600 text-xl"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-slate-800">Your Bids</h2>
+          </div>
+          
+          <div class="space-y-4">
+            <!-- Bid Item 1 -->
+            <div class="p-5 border border-slate-100 rounded-xl hover:bg-slate-50 transition-colors duration-200">
+              <div class="flex justify-between items-start">
+                <div>
+                  <h3 class="font-semibold text-slate-800">Rolex Submariner</h3>
+                  <p class="text-slate-500 text-sm mt-1">Placed 3 hours ago</p>
+                </div>
+                <span class="status-badge status-outbid">Outbid</span>
+              </div>
+              <div class="mt-4">
+                <div class="flex justify-between mb-1">
+                  <p class="text-slate-500">Your Bid</p>
+                  <p class="font-medium">$4,500.00</p>
+                </div>
+                <div class="flex justify-between">
+                  <p class="text-slate-500">Current Bid</p>
+                  <p class="font-medium text-emerald-600">$4,750.00</p>
+                </div>
+              </div>
+              <button class="mt-4 w-full bg-gradient-to-r from-indigo-500 to-emerald-500 text-white py-3 px-4 rounded-xl text-sm font-medium transition-colors duration-300">
+                Increase Bid
+              </button>
+            </div>
+            
+            <!-- Bid Item 2 -->
+            <div class="p-5 border border-slate-100 rounded-xl hover:bg-slate-50 transition-colors duration-200">
+              <div class="flex justify-between items-start">
+                <div>
+                  <h3 class="font-semibold text-slate-800">Abstract Painting</h3>
+                  <p class="text-slate-500 text-sm mt-1">Placed 5 hours ago</p>
+                </div>
+                <span class="status-badge status-winning">Winning</span>
+              </div>
+              <div class="mt-4">
+                <div class="flex justify-between mb-1">
+                  <p class="text-slate-500">Your Bid</p>
+                  <p class="font-medium text-emerald-600">$1,200.00</p>
+                </div>
+                <div class="flex justify-between">
+                  <p class="text-slate-500">Next Minimum</p>
+                  <p class="font-medium">$1,250.00</p>
+                </div>
+              </div>
+              <button class="mt-4 w-full bg-gradient-to-r from-indigo-500 to-emerald-500 text-white py-3 px-4 rounded-xl text-sm font-medium transition-colors duration-300">
+                Increase Bid
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- Account Settings Card -->
+        <section class="dashboard-card rounded-xl p-8 shadow-sm">
+          <div class="flex items-center mb-6">
+            <div class="bg-red-100 p-3 rounded-lg mr-4">
+              <i class="fas fa-user-cog text-red-600 text-xl"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-slate-800">Account Settings</h2>
+          </div>
+          
+          <form class="space-y-5">
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-2">Email Address</label>
+              <input type="email" value="esha.javeed@example.com" 
+                    class="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+            </div>
+            
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-2">Phone Number</label>
+              <input type="tel" placeholder="+1 (___) ___-____" 
+                    class="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+            </div>
+            
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-2">Change Password</label>
+              <input type="password" placeholder="Enter new password" 
+                    class="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent mb-3">
+              <input type="password" placeholder="Confirm new password" 
+                    class="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+            </div>
+            
+            <div class="pt-2">
+              <button type="submit" class="w-full bg-gradient-to-r from-indigo-500 to-emerald-500 text-white font-bold py-4 px-6 rounded-xl shadow hover:shadow-md transition-all duration-300">
+                <i class="fas fa-save mr-2"></i> Save Changes
+              </button>
+            </div>
+          </form>
+        </section>
+
+        <!-- Recent Notifications -->
+        <section class="dashboard-card rounded-xl p-8 shadow-sm">
+          <div class="flex items-center justify-between mb-6">
+            <div class="flex items-center">
+              <div class="bg-amber-100 p-3 rounded-lg mr-4">
+                <i class="fas fa-bell text-amber-600 text-xl"></i>
+              </div>
+              <h2 class="text-2xl font-bold text-slate-800">Notifications</h2>
+            </div>
+            <button class="text-slate-500 hover:text-slate-700">
+              <i class="fas fa-ellipsis-h"></i>
+            </button>
+          </div>
+          
+          <div class="space-y-4">
+            <div class="flex items-start p-4 bg-indigo-50 rounded-lg">
+              <div class="bg-indigo-100 p-2 rounded-lg mr-4">
+                <i class="fas fa-gavel text-indigo-600"></i>
+              </div>
+              <div>
+                <p class="font-medium text-slate-800">New bid on your Leica Camera</p>
+                <p class="text-slate-500 text-sm">$900.00 - 45 minutes ago</p>
+              </div>
+            </div>
+            
+            <div class="flex items-start p-4 rounded-lg hover:bg-slate-50 transition-colors duration-200">
+              <div class="bg-emerald-100 p-2 rounded-lg mr-4">
+                <i class="fas fa-check-circle text-emerald-600"></i>
+              </div>
+              <div>
+                <p class="font-medium text-slate-800">Payment received for Apple Watch</p>
+                <p class="text-slate-500 text-sm">$450.00 - 3 hours ago</p>
+              </div>
+            </div>
+            
+            <div class="flex items-start p-4 rounded-lg hover:bg-slate-50 transition-colors duration-200">
+              <div class="bg-purple-100 p-2 rounded-lg mr-4">
+                <i class="fas fa-truck text-purple-600"></i>
+              </div>
+              <div>
+                <p class="font-medium text-slate-800">Your Rolex has shipped</p>
+                <p class="text-slate-500 text-sm">Tracking #123456789 - Yesterday</p>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-slate-900 text-white py-12">
+    <div class="container mx-auto px-6">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-12">
+        <!-- About -->
+        <div>
+          <div class="flex items-center mb-4">
+            <i class="fas fa-gavel text-indigo-400 text-2xl mr-2"></i>
+            <h3 class="text-xl font-bold">Auction<span class="text-indigo-400">Hub</span></h3>
+          </div>
+          <p class="text-slate-400 mb-4">The premier online auction platform for luxury goods and rare collectibles.</p>
+          <div class="flex space-x-4">
+            <a href="#" class="text-slate-400 hover:text-white text-xl transition-colors duration-300">
+              <i class="fab fa-facebook-f"></i>
+            </a>
+            <a href="#" class="text-slate-400 hover:text-white text-xl transition-colors duration-300">
+              <i class="fab fa-twitter"></i>
+            </a>
+            <a href="#" class="text-slate-400 hover:text-white text-xl transition-colors duration-300">
+              <i class="fab fa-instagram"></i>
+            </a>
+            <a href="#" class="text-slate-400 hover:text-white text-xl transition-colors duration-300">
+              <i class="fab fa-pinterest-p"></i>
+            </a>
+          </div>
+        </div>
+        
+        <!-- Quick Links -->
+        <div>
+          <h4 class="text-lg font-semibold mb-4">Quick Links</h4>
+          <ul class="space-y-2">
+            <li><a href="#" class="text-slate-400 hover:text-white transition-colors duration-300">About Us</a></li>
+            <li><a href="#" class="text-slate-400 hover:text-white transition-colors duration-300">How It Works</a></li>
+            <li><a href="#" class="text-slate-400 hover:text-white transition-colors duration-300">Testimonials</a></li>
+            <li><a href="#" class="text-slate-400 hover:text-white transition-colors duration-300">Careers</a></li>
+            <li><a href="#" class="text-slate-400 hover:text-white transition-colors duration-300">Blog</a></li>
+          </ul>
+        </div>
+        
+        <!-- Help -->
+        <div>
+          <h4 class="text-lg font-semibold mb-4">Help & Support</h4>
+          <ul class="space-y-2">
+            <li><a href="#" class="text-slate-400 hover:text-white transition-colors duration-300">FAQs</a></li>
+            <li><a href="#" class="text-slate-400 hover:text-white transition-colors duration-300">Contact Us</a></li>
+            <li><a href="#" class="text-slate-400 hover:text-white transition-colors duration-300">Shipping Info</a></li>
+            <li><a href="#" class="text-slate-400 hover:text-white transition-colors duration-300">Returns Policy</a></li>
+            <li><a href="#" class="text-slate-400 hover:text-white transition-colors duration-300">Payment Methods</a></li>
+          </ul>
+        </div>
+        
+        <!-- Newsletter -->
+        <div>
+          <h4 class="text-lg font-semibold mb-4">Newsletter</h4>
+          <p class="text-slate-400 mb-4">Subscribe for exclusive auctions and updates.</p>
+          <form class="flex">
+            <input type="email" placeholder="Your email" class="flex-grow px-4 py-2 rounded-l-lg focus:outline-none text-slate-800">
+            <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded-r-lg transition-colors duration-300">
+              <i class="fas fa-paper-plane"></i>
+            </button>
+          </form>
+        </div>
+      </div>
+      
+      <div class="border-t border-slate-800 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
+        <p class="text-slate-400 mb-4 md:mb-0">&copy; 2023 AuctionHub. All rights reserved.</p>
+        <div class="flex space-x-6">
+          <a href="#" class="text-slate-400 hover:text-white transition-colors duration-300">Privacy Policy</a>
+          <a href="#" class="text-slate-400 hover:text-white transition-colors duration-300">Terms of Service</a>
+          <a href="#" class="text-slate-400 hover:text-white transition-colors duration-300">Sitemap</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Mobile menu toggle
+    document.getElementById('mobile-menu-button').addEventListener('click', function() {
+      const menu = document.getElementById('mobile-menu');
+      menu.classList.toggle('hidden');
+    });
+
+    // Countdown timers
+    function updateCountdowns() {
+      const timers = document.querySelectorAll('.countdown-badge');
+      timers.forEach(timer => {
+        // For demo purposes - in a real app you would calculate actual time remaining
+        const currentText = timer.textContent;
+        const parts = currentText.split(':');
+        let hours = parseInt(parts[0]);
+        let minutes = parseInt(parts[1]);
+        let seconds = parseInt(parts[2]);
+        
+        seconds--;
+        if (seconds < 0) {
+          seconds = 59;
+          minutes--;
+          if (minutes < 0) {
+            minutes = 59;
+            hours--;
+          }
+        }
+        
+        timer.textContent = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+      });
+    }
+    
+    setInterval(updateCountdowns, 1000);
+
+    // Image upload preview
+    document.addEventListener('DOMContentLoaded', function() {
+      const fileInput = document.querySelector('input[type="file"]');
+      const imagePreviews = document.getElementById('imagePreviews');
+      
+      fileInput.addEventListener('change', function(e) {
+        imagePreviews.innerHTML = '';
+        
+        Array.from(e.target.files).forEach((file, index) => {
+          if (index >= 6) return; // Limit to 6 previews
+          
+          const reader = new FileReader();
+          reader.onload = function(event) {
+            const preview = document.createElement('div');
+            preview.className = 'relative';
+            preview.innerHTML = `
+              <img src="${event.target.result}" class="w-full h-24 object-cover rounded-lg">
+              <button type="button" class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs" data-index="${index}">
+                &times;
+              </button>
+            `;
+            imagePreviews.appendChild(preview);
+          };
+          reader.readAsDataURL(file);
+        });
+      });
+      
+      // Handle image removal
+      imagePreviews.addEventListener('click', function(e) {
+        if (e.target.tagName === 'BUTTON') {
+          const index = e.target.getAttribute('data-index');
+          const files = Array.from(fileInput.files);
+          files.splice(index, 1);
+          
+          // Create new FileList (simplified approach)
+          const dataTransfer = new DataTransfer();
+          files.forEach(file => dataTransfer.items.add(file));
+          fileInput.files = dataTransfer.files;
+          
+          // Trigger change event to update previews
+          fileInput.dispatchEvent(new Event('change'));
+        }
+      });
+      
+      // Form submission
+      document.getElementById('listingForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        alert('Item listed successfully!');
+        this.reset();
+        imagePreviews.innerHTML = '';
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AuctionHub - Sell Your Items</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    .bg-auction-hub {
+      background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+    }
+    .form-section {
+      backdrop-filter: blur(8px);
+      background-color: rgba(255, 255, 255, 0.85);
+    }
+    .file-upload {
+      border: 2px dashed #cbd5e0;
+      transition: all 0.3s ease;
+    }
+    .file-upload:hover {
+      border-color: #4299e1;
+    }
+  </style>
+</head>
+<body class="bg-auction-hub min-h-screen flex flex-col">
+  <!-- Navigation -->
+  <nav class="bg-gray-900 text-white shadow-lg">
+    <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+      <div class="flex items-center space-x-2">
+        <i class="fas fa-gavel text-2xl text-blue-400"></i>
+        <a href="../../index.html" class="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">AuctionHub</a>
+      </div>
+      
+      <div class="hidden md:flex items-center space-x-6">
+        <a href="../../index.html" class="hover:text-blue-400 transition duration-300">
+          <i class="fas fa-home mr-1"></i> Home
+        </a>
+        <a href="../pages/auction.html" class="hover:text-blue-400 transition duration-300">
+          <i class="fas fa-hammer mr-1"></i> Auctions
+        </a>
+        <a href="../pages/sell.html" class="text-blue-400 font-semibold">
+          <i class="fas fa-plus-circle mr-1"></i> Sell
+        </a>
+        <a href="../pages/dashboard.html" class="hover:text-blue-400 transition duration-300">
+          <i class="fas fa-tachometer-alt mr-1"></i> Dashboard
+        </a>
+        <a href="../pages/login.html" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg transition duration-300">
+          <i class="fas fa-sign-in-alt mr-1"></i> Login
+        </a>
+      </div>
+      
+      <button class="md:hidden text-white focus:outline-none">
+        <i class="fas fa-bars text-2xl"></i>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="flex-grow container mx-auto px-4 py-8">
+    <div class="max-w-4xl mx-auto">
+      <div class="text-center mb-10">
+        <h1 class="text-4xl font-bold text-white mb-3">Sell With AuctionHub</h1>
+        <p class="text-xl text-gray-200">List your items and reach thousands of potential buyers</p>
+      </div>
+      
+      <!-- Sell Form -->
+      <div class="form-section rounded-xl shadow-2xl overflow-hidden p-6 md:p-8">
+        <form id="sellForm" class="space-y-6">
+          <!-- Item Details -->
+          <div>
+            <h2 class="text-2xl font-semibold text-gray-800 mb-4 border-b pb-2">Item Details</h2>
+            
+            <div class="grid md:grid-cols-2 gap-6">
+              <div>
+                <label for="itemTitle" class="block text-gray-700 font-medium mb-2">Item Title*</label>
+                <input type="text" id="itemTitle" placeholder="e.g. Vintage Rolex Watch" 
+                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+              </div>
+              
+              <div>
+                <label for="itemCategory" class="block text-gray-700 font-medium mb-2">Category*</label>
+                <select id="itemCategory" 
+                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                  <option value="">Select a category</option>
+                  <option value="electronics">Electronics</option>
+                  <option value="jewelry">Jewelry</option>
+                  <option value="art">Art & Collectibles</option>
+                  <option value="fashion">Fashion</option>
+                  <option value="home">Home & Garden</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+            </div>
+            
+            <div class="mt-6">
+              <label for="itemDescription" class="block text-gray-700 font-medium mb-2">Description*</label>
+              <textarea id="itemDescription" rows="5" placeholder="Provide detailed description of your item..." 
+                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"></textarea>
+            </div>
+          </div>
+          
+          <!-- Pricing -->
+          <div>
+            <h2 class="text-2xl font-semibold text-gray-800 mb-4 border-b pb-2">Pricing</h2>
+            
+            <div class="grid md:grid-cols-3 gap-6">
+              <div>
+                <label for="startingBid" class="block text-gray-700 font-medium mb-2">Starting Bid ($)*</label>
+                <input type="number" id="startingBid" min="1" placeholder="50" 
+                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+              </div>
+              
+              <div>
+                <label for="reservePrice" class="block text-gray-700 font-medium mb-2">Reserve Price ($)</label>
+                <input type="number" id="reservePrice" min="0" placeholder="Optional" 
+                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+              </div>
+              
+              <div>
+                <label for="auctionDuration" class="block text-gray-700 font-medium mb-2">Auction Duration*</label>
+                <select id="auctionDuration" 
+                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                  <option value="1">1 day</option>
+                  <option value="3" selected>3 days</option>
+                  <option value="5">5 days</option>
+                  <option value="7">7 days</option>
+                  <option value="10">10 days</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Images -->
+          <div>
+            <h2 class="text-2xl font-semibold text-gray-800 mb-4 border-b pb-2">Item Images</h2>
+            
+            <div class="file-upload p-8 rounded-lg text-center cursor-pointer mb-4">
+              <input type="file" id="itemImages" accept="image/*" multiple class="hidden">
+              <label for="itemImages" class="cursor-pointer">
+                <i class="fas fa-cloud-upload-alt text-4xl text-blue-500 mb-2"></i>
+                <p class="text-gray-700 font-medium">Click to upload images or drag and drop</p>
+                <p class="text-gray-500 text-sm mt-1">Upload up to 10 images (max 5MB each)</p>
+              </label>
+            </div>
+            
+            <div id="imagePreview" class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4"></div>
+          </div>
+          
+          <!-- Shipping -->
+          <div>
+            <h2 class="text-2xl font-semibold text-gray-800 mb-4 border-b pb-2">Shipping & Details</h2>
+            
+            <div class="grid md:grid-cols-2 gap-6">
+              <div>
+                <label for="itemCondition" class="block text-gray-700 font-medium mb-2">Item Condition*</label>
+                <select id="itemCondition" 
+                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                  <option value="">Select condition</option>
+                  <option value="new">New</option>
+                  <option value="like_new">Like New</option>
+                  <option value="good">Good</option>
+                  <option value="fair">Fair</option>
+                  <option value="poor">Poor</option>
+                </select>
+              </div>
+              
+              <div>
+                <label class="block text-gray-700 font-medium mb-2">Shipping Options*</label>
+                <div class="space-y-2">
+                  <label class="flex items-center">
+                    <input type="checkbox" name="shipping" value="local_pickup" class="mr-2">
+                    <span>Local Pickup</span>
+                  </label>
+                  <label class="flex items-center">
+                    <input type="checkbox" name="shipping" value="free_shipping" class="mr-2">
+                    <span>Free Shipping</span>
+                  </label>
+                  <label class="flex items-center">
+                    <input type="checkbox" name="shipping" value="calculated" class="mr-2">
+                    <span>Calculated Shipping</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Submit Button -->
+          <div class="pt-4">
+            <button type="submit" class="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold py-3 px-6 rounded-lg hover:from-blue-700 hover:to-purple-700 transition duration-300 shadow-lg">
+              <i class="fas fa-gavel mr-2"></i> List Item for Auction
+            </button>
+            <p class="text-gray-500 text-sm mt-2 text-center">By listing your item, you agree to our Terms of Service</p>
+          </div>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-gray-900 text-white py-10">
+    <div class="container mx-auto px-4">
+      <div class="grid md:grid-cols-4 gap-8 mb-8">
+        <div>
+          <h3 class="text-xl font-bold mb-4 flex items-center">
+            <i class="fas fa-gavel text-blue-400 mr-2"></i> AuctionHub
+          </h3>
+          <p class="text-gray-400">The premier online auction platform for buying and selling unique items.</p>
+        </div>
+        
+        <div>
+          <h4 class="font-semibold text-lg mb-4">Quick Links</h4>
+          <ul class="space-y-2">
+            <li><a href="../../index.html" class="text-gray-400 hover:text-blue-400 transition">Home</a></li>
+            <li><a href="../pages/auction.html" class="text-gray-400 hover:text-blue-400 transition">Live Auctions</a></li>
+            <li><a href="../pages/sell.html" class="text-gray-400 hover:text-blue-400 transition">Sell Items</a></li>
+            <li><a href="../pages/dashboard.html" class="text-gray-400 hover:text-blue-400 transition">My Dashboard</a></li>
+          </ul>
+        </div>
+        
+        <div>
+          <h4 class="font-semibold text-lg mb-4">Help & Support</h4>
+          <ul class="space-y-2">
+            <li><a href="#" class="text-gray-400 hover:text-blue-400 transition">FAQs</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-blue-400 transition">Shipping Policy</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-blue-400 transition">Returns</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-blue-400 transition">Contact Support</a></li>
+          </ul>
+        </div>
+        
+        <div>
+          <h4 class="font-semibold text-lg mb-4">Connect With Us</h4>
+          <div class="flex space-x-4 mb-4">
+            <a href="#" class="text-gray-400 hover:text-blue-400 text-xl"><i class="fab fa-facebook"></i></a>
+            <a href="#" class="text-gray-400 hover:text-blue-400 text-xl"><i class="fab fa-twitter"></i></a>
+            <a href="#" class="text-gray-400 hover:text-blue-400 text-xl"><i class="fab fa-instagram"></i></a>
+            <a href="#" class="text-gray-400 hover:text-blue-400 text-xl"><i class="fab fa-pinterest"></i></a>
+          </div>
+          <p class="text-gray-400">Subscribe to our newsletter</p>
+          <div class="mt-2 flex">
+            <input type="email" placeholder="Your email" class="px-3 py-2 bg-gray-800 text-white rounded-l-lg focus:outline-none">
+            <button class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-r-lg">
+              <i class="fas fa-paper-plane"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <div class="border-t border-gray-800 pt-6 text-center text-gray-400">
+        <p>&copy; 2023 AuctionHub. All rights reserved. | <a href="#" class="hover:text-blue-400">Privacy Policy</a> | <a href="#" class="hover:text-blue-400">Terms of Service</a></p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Image preview functionality
+    document.getElementById('itemImages').addEventListener('change', function(e) {
+      const preview = document.getElementById('imagePreview');
+      preview.innerHTML = '';
+      
+      if (this.files) {
+        Array.from(this.files).forEach(file => {
+          const reader = new FileReader();
+          
+          reader.onload = function(event) {
+            const div = document.createElement('div');
+            div.className = 'relative';
+            div.innerHTML = `
+              <img src="${event.target.result}" class="w-full h-32 object-cover rounded-lg">
+              <button class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center">
+                <i class="fas fa-times text-xs"></i>
+              </button>
+            `;
+            preview.appendChild(div);
+          }
+          
+          reader.readAsDataURL(file);
+        });
+      }
+    });
+    
+    // Form submission
+    document.getElementById('sellForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      // Here you would normally handle form submission
+      alert('Your item has been listed for auction!');
+      this.reset();
+      document.getElementById('imagePreview').innerHTML = '';
+    });
+  </script>
+</body>
+</html>
